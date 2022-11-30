@@ -1,0 +1,91 @@
+/*----------------------AREA 1: CODIGO DE USUARIO-------------------------*/
+
+//---------------> importaciones, paquetes
+package Analizador_HTML;
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
+//---------------> codigo para el parser, variables, metodos
+
+
+parser code
+{:    
+
+    public String titulo="";
+    public String noufe="";
+    public static ArrayList<String> misIDShtml = new ArrayList<String>();
+
+    //para guardar los errores sintacticos
+    public static Object [] encabezado={"","",""};
+    public static DefaultTableModel tablaerroresSintacticosHTML=new DefaultTableModel(encabezado,0);
+
+    //Metodo al que se llama automaticamente ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        Object[] cars = {lexema, fila, columna};
+        tablaerroresSintacticosHTML.addRow(cars);
+        /*System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);*/
+
+        
+    }
+
+    //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        /*System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);*/
+
+     
+    }
+:}
+
+//-------------> Codigo para las acciones gramaticales
+action code
+{:
+:}
+
+/*----------------------AREA 2: DECLARACIONES-------------------------*/
+
+//--------------->declaracion de terminales
+terminal String ghtml, gbody, ghead, gtitle, gnoufe, gdiv, gid;
+terminal String menor, mayor, diagonal, igual;
+terminal String cadena;
+
+non terminal String CABEZA, TITULO, NOUFDIV;
+
+//--------------->declaracion de no terminales
+non terminal INICIO;
+
+start with INICIO;
+
+
+// <html> CABEZA
+INICIO::= menor ghtml mayor CABEZA:tit {: titulo=tit; :};
+
+// <head> TITULO
+CABEZA::= menor ghead mayor TITULO:tit {: RESULT = tit; :};
+
+// <title> mititulocadena </title> </head> <body> NOUFDIV 
+TITULO::= menor gtitle mayor cadena:tit menor diagonal gtitle mayor menor diagonal ghead mayor menor gbody mayor NOUFDIV:noufee {: noufe=noufee;  RESULT = tit;:};
+
+           // <noufe>micad</noufe> o // <div> id="gud"</div>
+NOUFDIV::= menor gnoufe mayor cadena:noufee menor diagonal gnoufe mayor NOUFDIV {: RESULT=noufee; :}
+        |  menor gdiv gid igual cadena:divv mayor menor diagonal gdiv mayor NOUFDIV  {: String op= divv.substring(1,divv.length()-1); misIDShtml.add(op); :}
+
+        // </body> </html>
+        | menor diagonal gbody mayor menor diagonal ghtml mayor;
+        

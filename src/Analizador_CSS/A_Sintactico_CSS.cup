@@ -1,0 +1,328 @@
+/*----------------------AREA 1: CODIGO DE USUARIO-------------------------*/
+
+//---------------> importaciones, paquetes
+package Analizador_CSS;
+import java_cup.runtime.Symbol;
+import java.awt.Color;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.util.ArrayList;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.ImageIcon;
+import javax.swing.Icon;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import java.awt.Font;
+import javax.swing.table.DefaultTableModel;
+
+//---------------> codigo para el parser, variables, metodos
+
+
+parser code
+{:    
+
+    public static ArrayList<Object> listCualquierComponent = new ArrayList<Object>();
+    public static ArrayList<String> listCualquierComponentNameclass = new ArrayList<String>();
+
+    //para guardar los errores sintacticos
+    public static Object [] encabezado={"","",""};
+    public static DefaultTableModel tablaerroresSintacticosCSS=new DefaultTableModel(encabezado,0);
+
+    //Metodo al que se llama automaticamente ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        Object[] cars = {lexema, fila, columna};
+        tablaerroresSintacticosCSS.addRow(cars);
+
+        /*System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna); */       
+    }
+
+    //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        /*System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);*/
+     
+    }
+:}
+
+//-------------> Codigo para las acciones gramaticales
+action code
+{:
+:}
+
+/*----------------------AREA 2: DECLARACIONES-------------------------*/
+
+//--------------->declaracion de terminales
+terminal String llaveabre, llavecierra, parenabre, parencierra, coma, dospuntos, puntoycoma, punto;
+terminal String backgroundd, boorder, bcolor, bwidth, aligndecla, fontt, fsize, fcolor, hightt, widthh, rgbb, alineam, booll, nomcolor;
+terminal String intt, id, hexad, fuent;
+
+//--------------->declaracion de no terminales
+non terminal INICIO, SELECTOR;
+non terminal String VALOR2, VALOR4, VALOR5, VALOR6, VALOR7, VALOR9, VALOR10;
+non terminal String BORDE, BORDGROSOR, ALINEACION, FUENTE, TAMFUENTE, ALTO, ANCHO;
+non terminal Color VALOR1, FONDO, BORDECOLOR, COLFUENTE;
+
+start with INICIO;
+
+INICIO::= SELECTOR;
+
+SELECTOR::= id:a llaveabre FONDO:b BORDE:c BORDECOLOR:d BORDGROSOR:e ALINEACION:f FUENTE:g TAMFUENTE:h COLFUENTE:i ALTO:j ANCHO:k llavecierra SELECTOR
+          {: for (int m = 0; m < listCualquierComponentNameclass.size(); m++) 
+            {
+              if(a.equals(listCualquierComponentNameclass.get(m)))
+              {
+                  try{
+                        JPanel nuevoo=(JPanel)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        //if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);                        
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JLabel nuevoo=(JLabel)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JTextField nuevoo=(JTextField)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/ }
+                  try{
+                        JButton nuevoo=(JButton)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JComboBox nuevoo=(JComboBox)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        //if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JSpinner nuevoo=(JSpinner)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        //if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+              }
+            } :}
+
+          | punto id:a llaveabre FONDO:b BORDE:c BORDECOLOR:d BORDGROSOR:e ALINEACION:f FUENTE:g TAMFUENTE:h COLFUENTE:i ALTO:j ANCHO:k llavecierra SELECTOR
+          {: for (int m = 0; m < listCualquierComponentNameclass.size(); m++) 
+            {
+              if(a.equals(listCualquierComponentNameclass.get(m)))
+              {
+                  try{
+                        JPanel nuevoo=(JPanel)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        //if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);                        
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JLabel nuevoo=(JLabel)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JTextField nuevoo=(JTextField)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/ }
+                  try{
+                        JButton nuevoo=(JButton)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JComboBox nuevoo=(JComboBox)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        //if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+                  try{
+                        JSpinner nuevoo=(JSpinner)listCualquierComponent.get(m);
+                        if(b!=null){nuevoo.setBackground(b); nuevoo.setOpaque(true);}
+                        if(c!=null && d!=null && e!=null){ if(c.equals("true")){ Border borderr = BorderFactory.createLineBorder(d, Integer.parseInt(e)); nuevoo.setBorder(borderr); } }
+                        //if(f!=null){ if(f.toLowerCase().equals("left")){ nuevoo.setHorizontalAlignment(nuevoo.LEFT); } else if(f.toLowerCase().equals("right")){ nuevoo.setHorizontalAlignment(nuevoo.RIGHT); } else if(f.toLowerCase().equals("center")){ nuevoo.setHorizontalAlignment(nuevoo.CENTER); } }
+                        if(g!=null && h!=null){ Font font = new Font(g, Font.PLAIN, Integer.parseInt(h)); nuevoo.setFont(font); }
+                        if(i!=null){ nuevoo.setForeground(i); }
+                        if(j!=null && k!=null){ nuevoo.setSize(Integer.parseInt(k),Integer.parseInt(j)); }
+                        listCualquierComponent.remove(m);
+                        listCualquierComponent.add(m,nuevoo);
+                        
+                  }catch(Exception n){ /*System.out.println("error"+n);*/  }
+              }
+            } :}
+
+          | ;
+
+FONDO::= backgroundd dospuntos VALOR1:a {: RESULT=a; :}
+        | ;
+
+BORDE::= boorder dospuntos VALOR2:a {: RESULT=a; :}
+        | ;
+
+BORDECOLOR::= bcolor dospuntos VALOR1:a {: RESULT=a; :}
+        | ;
+
+BORDGROSOR::= bwidth dospuntos VALOR4:a {: RESULT=a; :}
+        | ;
+
+ALINEACION::= aligndecla dospuntos VALOR5:a {: RESULT=a; :}
+        | ;
+
+FUENTE::= fontt dospuntos VALOR6:a {: RESULT=a; :}
+        | ;
+
+TAMFUENTE::= fsize dospuntos VALOR7:a {: RESULT=a; :}
+        | ;
+
+COLFUENTE::= fcolor dospuntos VALOR1:a {: RESULT=a; :}
+        | ;
+
+ALTO::= hightt dospuntos VALOR9:a {: RESULT=a; :}
+        | ;
+
+ANCHO::= widthh dospuntos VALOR10:a {: RESULT=a; :}
+        | ;
+
+VALOR1::= hexad:a puntoycoma {: Color c= Color.decode(a); RESULT=c; :}
+        | nomcolor:a puntoycoma {: if(a.toLowerCase().equals("red")){ Color c=Color.RED; RESULT=c; } else if(a.toLowerCase().equals("pink")){ Color c=Color.PINK; RESULT=c; } 
+           else if(a.toLowerCase().equals("orange")){ Color c=Color.ORANGE; RESULT=c; } else if(a.toLowerCase().equals("yellow")){ Color c=Color.yellow; RESULT=c; } 
+           else if(a.toLowerCase().equals("purple")){ Color c=Color.magenta;  RESULT=c; } else if(a.toLowerCase().equals("magenta")){ Color c=Color.MAGENTA; RESULT=c; } 
+           else if(a.toLowerCase().equals("green")){ Color c=Color.GREEN; RESULT=c; } else if(a.toLowerCase().equals("blue")){ Color c=Color.BLUE; RESULT=c; } 
+           else if(a.toLowerCase().equals("brown")){ Color c=Color.yellow; RESULT=c; } else if(a.toLowerCase().equals("white")){ Color c=Color.white; RESULT=c; } 
+           else if(a.toLowerCase().equals("gray")){ Color c=Color.gray; RESULT=c; } else if(a.toLowerCase().equals("black")){ Color c=Color.BLACK; RESULT=c; } :}
+        | rgbb parenabre intt coma intt coma intt parencierra puntoycoma;
+
+VALOR2::= booll:a puntoycoma {: RESULT=a; :};
+
+VALOR4::= intt:a puntoycoma {: RESULT=a; :};
+
+VALOR5::= alineam:a puntoycoma {: RESULT=a; :};
+
+VALOR6::= fuent:a puntoycoma {: String op= a.substring(1,a.length()-1); RESULT=op; :};
+
+VALOR7::= intt:a puntoycoma {: RESULT=a; :};
+
+VALOR9::= intt:a puntoycoma {: RESULT=a; :};
+
+VALOR10::= intt:a puntoycoma {: RESULT=a; :} ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

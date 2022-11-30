@@ -1,0 +1,525 @@
+/*----------------------AREA 1: CODIGO DE USUARIO-------------------------*/
+
+//---------------> importaciones, paquetes
+package Analizador_UFE;
+import java_cup.runtime.Symbol;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.util.ArrayList;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.ImageIcon;
+import javax.swing.Icon;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.Stack;
+import Analizador_UFE.analisis_sintactico_UFE_GuardarVariables;
+import Analizador_UFE.analisis_sintactico_UFE_AsignacionVariables;
+import Analizador_UFE.analisis_sintactico_UFE_AsignacionVariables2;
+import Analizador_UFE.analisis_sintactico_UFE_AsignacionVariables3;
+import Analizador_UFE.analisis_sintactico_UFE_ImportCSS;
+import Analizador_UFE.analisis_sintactico_UFE_ComponentPrincipal;
+import Analizador_UFE.analisis_sintactico_UFE_Imprimir;
+import Analizador_UFE.analisis_sintactico_UFE_Repetir;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.io.*;
+
+//---------------> codigo para el parser, variables, metodos
+
+parser code
+{:  
+
+    public static HashMap<String,Object> hmGuardarVariables= new HashMap<String,Object>();
+    public static HashMap<String,Object[]> hmArreglos=new HashMap<String,Object[]>();
+    public static ArrayList<Object> temporalLarr = new ArrayList<Object>();
+    Stack<String> pila_erroresSemanticos = new Stack<String>();
+
+    public static HashMap<String,Object> hmComponentes= new HashMap<String,Object>();
+
+    public static ArrayList<Object> listCualquierComponent = new ArrayList<Object>();
+    public static ArrayList<String> listCualquierComponentNameclass = new ArrayList<String>();
+
+    public String textRepetir="";
+    public String numVueltas="";
+
+    public void metodoRepetir(String textoEntrada, String valor)
+    {           
+        int valora=Integer.parseInt(numVueltas);
+        System.out.println(valora);
+        System.out.println(textRepetir);
+        System.out.println("");
+        textoEntrada=textRepetir;
+        for(int i=0; i<valora; i++)
+        {
+                try {
+                //guardar variables
+                ScanerUFE scanUFE=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_GuardarVariables parserGuardarVariables=new analisis_sintactico_UFE_GuardarVariables(scanUFE);
+                //asignacionVariables 
+                ScanerUFE scanUFE1=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_AsignacionVariables parserAsignacionVariables=new analisis_sintactico_UFE_AsignacionVariables(scanUFE1);
+                //asignacionVariables2 
+                ScanerUFE scanUFE2=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_AsignacionVariables2 parserAsignacionVariables2=new analisis_sintactico_UFE_AsignacionVariables2(scanUFE2);
+                //asignacionVariables3 
+                ScanerUFE scanUFE3=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_AsignacionVariables3 parserAsignacionVariables3=new analisis_sintactico_UFE_AsignacionVariables3(scanUFE3);
+                //asignacionVariables2 segunda pasada 
+                ScanerUFE scanUFE2n=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_AsignacionVariables2 parserAsignacionVariables2n=new analisis_sintactico_UFE_AsignacionVariables2(scanUFE2n);
+                //importComponent
+                /*ScanerUFE scanUFE4=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_ImportComponent parserImportComponent=new analisis_sintactico_UFE_ImportComponent(scanUFE4);
+                //componentePrincipal
+                ScanerUFE scanUFE5=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_ComponentPrincipal parserComponentPrincipal=new analisis_sintactico_UFE_ComponentPrincipal(scanUFE5);
+                //Imprimir
+                ScanerUFE scanUFE6=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_Render parserRender=new analisis_sintactico_UFE_Render(scanUFE6);*/
+
+                ScanerUFE scanUFE4=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_Imprimir parserImprimir=new analisis_sintactico_UFE_Imprimir(scanUFE4);
+
+                ScanerUFE scanUFE5=new ScanerUFE(new BufferedReader(new StringReader(textoEntrada)));
+                analisis_sintactico_UFE_Repetir parserRepetir=new analisis_sintactico_UFE_Repetir(scanUFE5);
+                
+                parserGuardarVariables.hmGuardarVariables= (HashMap)hmGuardarVariables.clone();
+                parserGuardarVariables.hmArreglos= (HashMap)hmArreglos.clone();
+
+                parserGuardarVariables.parse();
+
+                //pasa las listas de guardarVariables para AsignacionVariables
+                parserAsignacionVariables.hmGuardarVariables= (HashMap) parserGuardarVariables.hmGuardarVariables.clone();
+                parserAsignacionVariables.hmArreglos= (HashMap) parserGuardarVariables.hmArreglos.clone();
+                parserAsignacionVariables.listErroresSemanticos=parserGuardarVariables.listErroresSemanticos;
+
+                parserAsignacionVariables.parse();
+
+                //pasa las listas de AsignacionVariables para AsignacionVariables2
+                parserAsignacionVariables2.hmGuardarVariables= (HashMap) parserAsignacionVariables.hmGuardarVariables.clone();
+                parserAsignacionVariables2.hmArreglos= (HashMap) parserAsignacionVariables.hmArreglos.clone();
+                parserAsignacionVariables2.listErroresSemanticos=parserAsignacionVariables.listErroresSemanticos;
+
+                parserAsignacionVariables2.parse();
+
+                //pasa las listas de AsignacionVariables2 para AsignacionVariables3
+                parserAsignacionVariables3.hmGuardarVariables= (HashMap) parserAsignacionVariables2.hmGuardarVariables.clone();
+                parserAsignacionVariables3.hmArreglos= (HashMap) parserAsignacionVariables2.hmArreglos.clone();
+                parserAsignacionVariables3.listErroresSemanticos=parserAsignacionVariables2.listErroresSemanticos;
+
+                parserAsignacionVariables3.parse();
+
+                //pasa las listas de AsignacionVariables3 para AsignacionVariables2, segunda pasada
+                parserAsignacionVariables2n.hmGuardarVariables= (HashMap) parserAsignacionVariables3.hmGuardarVariables.clone();
+                parserAsignacionVariables2n.hmArreglos= (HashMap) parserAsignacionVariables3.hmArreglos.clone();
+
+                parserAsignacionVariables2n.parse();
+
+                parserImprimir.hmGuardarVariables= (HashMap) parserAsignacionVariables2n.hmGuardarVariables.clone();
+                parserImprimir.hmArreglos= (HashMap) parserAsignacionVariables2n.hmArreglos.clone();
+
+                parserImprimir.parse();
+
+                parserRepetir.hmGuardarVariables= (HashMap) parserImprimir.hmGuardarVariables.clone();
+                parserRepetir.hmArreglos= (HashMap) parserImprimir.hmArreglos.clone();
+
+                parserRepetir.parse();
+
+                
+                //pasa las listas de AsignacionVariables3 para ImportComponent
+                /*parserImportComponent.hmGuardarVariables= (HashMap) parserAsignacionVariables2n.hmGuardarVariables.clone();
+                parserImportComponent.hmArreglos= (HashMap) parserAsignacionVariables2n.hmArreglos.clone();
+
+                parserImportComponent.parse();
+
+                //pasa las listas de ImportComponent para componentPrincipal
+                parserComponentPrincipal.hmGuardarVariables= (HashMap) parserImportComponent.hmGuardarVariables.clone();
+                parserComponentPrincipal.hmArreglos= (HashMap) parserImportComponent.hmArreglos.clone();
+                parserComponentPrincipal.hmComponentes= (HashMap) parserImportComponent.hmComponentes.clone();
+
+                parserComponentPrincipal.parse();
+
+                //pasa listas de ComponentePrincipal a Render
+                parserRender.hmGuardarVariables= (HashMap) parserComponentPrincipal.hmGuardarVariables.clone();
+                parserRender.hmArreglos= (HashMap) parserComponentPrincipal.hmArreglos.clone();
+                parserRender.hmComponentes= (HashMap) parserComponentPrincipal.hmComponentes.clone();
+
+                parserRender.parse();
+
+                hmGuardarVariables= (HashMap) parserRender.hmGuardarVariables.clone();
+                hmArreglos= (HashMap) parserRender.hmArreglos.clone();
+                hmComponentes= (HashMap) parserRender.hmComponentes.clone();
+                listErroresSemanticos=parserAsignacionVariables3.listErroresSemanticos;*/
+
+
+                
+            } catch (Exception e) {
+                System.out.println("error"+e);
+            }
+        }
+    }
+
+    //Metodo al que se llama automaticamente ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+        
+    }
+
+    //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);     
+    }
+:}
+
+//-------------> Codigo para las acciones gramaticales
+action code
+{:
+:}
+
+/*----------------------AREA 2: DECLARACIONES-------------------------*/
+
+//--------------->declaracion de terminales
+terminal parenabre, parencierra, igual, coma, puntoycoma, mas, menos, producto, division, potencia, menorque, mayorque, llaveabre, llavecierra, igualigual, diferenteigual, menorigual, mayorigual, andd, orr, xorr, nott, corchabre, corchcierra;
+terminal String variab, booll, id, cadena, renderr, componentt, returnn;
+terminal String iduf, equis, ye, heightt, widthh, colorr, borderr, classnamee, panell, textt, textfieldd, buttonn, onclickk, listt, elementss, itemm, defaultt, spinnerr, maxx, minn, imagee, srcc, hexad, nomcolor;
+terminal String importt, fromm;
+terminal String sii, sinoo, mientrass, repetirr, imprimirr;
+terminal String intt;
+terminal String doublee;
+terminal String caracter;
+
+
+//--------------->declaracion de no terminales
+non terminal String INICIO;
+non terminal String ALGEBRAICA, DECLARARVARIABLE, DECLARARVARIABLE2, RELACIONAL, RELACIONAL2, LOGICAS, ASIGNARVARIABLE, TIPASIGNARVARIABLE, ASIGNAARREGLO, LISTARREGLO;
+non terminal String RENDER, COMPONENTE,TIPCOMPONENT2;
+non terminal String DENTROCOMPONENTE, TIPCOMPONENT;
+non terminal String IDC, EQUISC, YEC, WIDTHC, HEIGHTC, BORDERC, CLASSNAMEC, ONCLICKKK;
+non terminal String IMPORTT;
+non terminal Color COLORC;
+non terminal JComboBox ITEMMS;
+non terminal String MAXS, MINS;
+non terminal String SRC;
+non terminal String INSIF, INSELSEIFELSE, DENTROIF, DECVARIF;
+non terminal String INSMIENTRAS, DENTROMIENTRAS, DECVARMIENTRAS;
+non terminal String INSREPETIR, DENTROREPETIR, DECVARREPETIR;
+non terminal String IMPRIMIR, IMPRIOP;
+non terminal String IDARR;
+non terminal String TEXTENCOMPONENTES;
+non terminal String NEGATIVO;
+
+precedence left mas, menos;
+precedence left producto, division;
+precedence right potencia;
+precedence left orr;
+precedence left andd;
+precedence left xorr;
+precedence nonassoc mayorque, menorque, mayorigual, menorigual, igualigual, diferenteigual;
+precedence right nott;
+precedence nonassoc corchabre, corchcierra;
+
+start with INICIO;
+
+INICIO::= RENDER INICIO
+        | COMPONENTE INICIO
+        | variab DECLARARVARIABLE puntoycoma INICIO
+        | IMPORTT puntoycoma INICIO
+        | ASIGNARVARIABLE puntoycoma INICIO
+        | ASIGNAARREGLO puntoycoma INICIO
+        | INSIF INICIO
+        | INSREPETIR INICIO {: metodoRepetir("s","2"); :}
+        | INSMIENTRAS INICIO
+        | IMPRIMIR puntoycoma INICIO
+        | ;
+
+DECLARARVARIABLE::= DECLARARVARIABLE:a coma id:b DECLARARVARIABLE2:c {::}
+                 | id:a DECLARARVARIABLE2:b {::};
+
+DECLARARVARIABLE2::= igual ALGEBRAICA:a {: RESULT=a; :}
+                    | igual LOGICAS:a {: RESULT=a; :}
+                    | corchabre intt:a corchcierra {::}
+                    | igual llaveabre LISTARREGLO llavecierra {::} 
+                    |;
+
+RENDER::= renderr parenabre menorque id:idcomp division mayorque coma id:iddiv parencierra puntoycoma {: :}; 
+
+COMPONENTE::= componentt id:a parenabre parencierra llaveabre DENTROCOMPONENTE llavecierra {::};
+
+DENTROCOMPONENTE::= returnn parenabre TIPCOMPONENT parencierra puntoycoma DENTROCOMPONENTE
+                | variab DECLARARVARIABLE puntoycoma DENTROCOMPONENTE
+                | IMPORTT puntoycoma DENTROCOMPONENTE
+                | ASIGNARVARIABLE puntoycoma DENTROCOMPONENTE
+                | ASIGNAARREGLO puntoycoma DENTROCOMPONENTE
+                | INSIF DENTROCOMPONENTE
+                | INSREPETIR DENTROCOMPONENTE
+                | INSMIENTRAS DENTROCOMPONENTE
+                | IMPRIMIR puntoycoma DENTROCOMPONENTE
+                |;
+               
+                 //empieza la estructura de un Panel (El que contendra todo)
+TIPCOMPONENT::= menorque panell IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque TIPCOMPONENT2
+                {::}
+
+              | menorque panell IDC EQUISC YEC HEIGHTC WIDTHC COLORC BORDERC CLASSNAMEC mayorque menorque division panell mayorque //por si no vienen mas panel adentro 
+              | menorque textt IDC EQUISC YEC HEIGHTC WIDTHC COLORC BORDERC CLASSNAMEC mayorque llaveabre id llavecierra menorque division textt mayorque
+              | menorque textfieldd IDC EQUISC YEC HEIGHTC WIDTHC COLORC BORDERC CLASSNAMEC mayorque llaveabre id llavecierra menorque division textfieldd mayorque
+              | menorque listt IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque menorque elementss mayorque ITEMMS:jcb menorque division elementss mayorque menorque defaultt mayorque intt:def menorque division defaultt mayorque menorque division listt mayorque  
+              | menorque spinnerr IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g ONCLICKKK:h CLASSNAMEC:j MAXS:k MINS:l mayorque intt:i menorque division spinnerr mayorque 
+              | menorque imagee IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h SRC:i mayorque
+              | menorque division id mayorque ; 
+
+TIPCOMPONENT2::= TIPCOMPONENT2 menorque division panell mayorque //para cerrar el panel principal
+
+                | TIPCOMPONENT2 menorque panell IDC EQUISC YEC HEIGHTC WIDTHC COLORC BORDERC CLASSNAMEC mayorque menorque division panell mayorque //termina con panel
+                
+                | TIPCOMPONENT2 menorque textt IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque TEXTENCOMPONENTES:i menorque division textt mayorque //termina con text
+                {::} 
+
+                | TIPCOMPONENT2 menorque textfieldd IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque TEXTENCOMPONENTES:i menorque division textfieldd mayorque
+                {::}
+
+                | TIPCOMPONENT2 menorque buttonn IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g ONCLICKKK:h CLASSNAMEC:j mayorque TEXTENCOMPONENTES:i menorque division buttonn mayorque 
+                {::}
+
+                | TIPCOMPONENT2 menorque listt IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque menorque elementss mayorque ITEMMS:jcb menorque division elementss mayorque menorque defaultt mayorque intt:def menorque division defaultt mayorque menorque division listt mayorque 
+                {::}    
+
+                | TIPCOMPONENT2 menorque spinnerr IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:j MAXS:k MINS:l mayorque intt:i menorque division spinnerr mayorque 
+                {::}
+
+                | TIPCOMPONENT2 menorque imagee IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h SRC:i mayorque 
+                {::}
+
+                | TIPCOMPONENT2 menorque division id:a mayorque
+                {::}
+
+                | menorque panell IDC EQUISC YEC HEIGHTC WIDTHC COLORC BORDERC CLASSNAMEC mayorque menorque division panell mayorque //empezara con un panel
+                
+                //text (jlabel)
+                | menorque textt IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque TEXTENCOMPONENTES:i menorque division textt mayorque
+                    {: :} 
+                
+                //textfield
+                | menorque textfieldd IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque TEXTENCOMPONENTES:i menorque division textfieldd mayorque 
+                {::}
+
+                | menorque buttonn IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g ONCLICKKK:h CLASSNAMEC:j mayorque TEXTENCOMPONENTES:i menorque division buttonn mayorque  
+                {::} 
+
+                | menorque listt IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h mayorque menorque elementss mayorque ITEMMS:jcb menorque division elementss mayorque menorque defaultt mayorque intt:def menorque division defaultt mayorque menorque division listt mayorque 
+                {::} 
+
+                | menorque spinnerr IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:j MAXS:k MINS:l mayorque intt:i menorque division spinnerr mayorque 
+                {::}
+
+                | menorque imagee IDC:a EQUISC:b YEC:c HEIGHTC:d WIDTHC:e COLORC:f BORDERC:g CLASSNAMEC:h SRC:i mayorque 
+                {::}  
+                    
+                | menorque division id:a mayorque
+                  {::};
+                
+ 
+ITEMMS::= ITEMMS:jcb menorque itemm mayorque TEXTENCOMPONENTES:a menorque division itemm mayorque
+         {::}
+        | menorque itemm mayorque TEXTENCOMPONENTES:a menorque division itemm mayorque
+        {::};
+
+IDC::= iduf igual id
+       | ;
+
+EQUISC::= equis igual intt:a {: RESULT=a; :}
+       | ;
+
+YEC::= ye igual intt:a {: RESULT=a; :}
+       | ;
+
+WIDTHC::= widthh igual intt:a {: RESULT=a; :}
+        | ;
+
+HEIGHTC::= heightt igual intt:a {: RESULT=a; :}
+        | ;
+
+COLORC::= colorr igual nomcolor:a {::}
+        | colorr igual hexad:a {::}
+        | ;
+
+BORDERC::= borderr igual intt:a {: RESULT=a; :}
+        | ;
+
+CLASSNAMEC::= classnamee igual cadena:a {::}
+        | ;
+
+ONCLICKKK::= onclickk igual TEXTENCOMPONENTES:a {: RESULT=a;  :}
+        | ;
+
+MAXS::= maxx igual intt:a  {: RESULT=a;  :}
+        | ;
+
+MINS::= minn igual intt:a  {: RESULT=a;  :}
+        | ;
+
+SRC::= srcc igual cadena:a {: RESULT=a; :} ;
+
+IMPORTT::= importt cadena
+        | importt id:a fromm cadena:b {::} ;
+
+TEXTENCOMPONENTES::= llaveabre ALGEBRAICA:a llavecierra {: RESULT=a; :} 
+                | id:a {: RESULT=a; :} ;
+
+//INSTRUCCION IF
+INSIF::= sii parenabre LOGICAS parencierra llaveabre DENTROIF llavecierra INSELSEIFELSE;
+
+INSELSEIFELSE::= sinoo sii parenabre LOGICAS parencierra llaveabre DENTROIF llavecierra INSELSEIFELSE
+                | sinoo llaveabre DENTROIF llavecierra INSELSEIFELSE
+                |;
+
+DENTROIF::= variab DECVARIF puntoycoma
+            | ;
+
+DECVARIF::= DECVARIF igual LOGICAS
+            | DECVARIF igual ALGEBRAICA
+            | DECVARIF corchabre intt corchcierra 
+            | DECVARIF igual llaveabre LISTARREGLO llavecierra 
+            | DECVARIF coma id
+            | id;
+
+//INSTRUCCION REPETIR
+INSREPETIR::= repetirr:a parenabre:b ALGEBRAICA:c parencierra:d llaveabre:e DENTROREPETIR:f llavecierra:g
+            {: String op=a+b+c+d+e+f+g; /*System.out.println(f);*/ textRepetir=f; numVueltas=c; /*metodoRepetir(f,c);*/ RESULT=op; :};
+
+DENTROREPETIR::= DENTROREPETIR:d variab:a DECVARREPETIR:b puntoycoma:c {: String op=" "+d+a+" "+b+c; RESULT=op; :}
+                | DENTROREPETIR:a ASIGNARVARIABLE:b puntoycoma:c {: String op=" "+a+b+c+" "; RESULT=op; :}
+                | DENTROREPETIR ASIGNAARREGLO puntoycoma 
+                | DENTROREPETIR INSIF 
+                | DENTROREPETIR:a INSREPETIR:b {: String op=" "+a+" "+b; RESULT=op;  :}
+                | DENTROREPETIR INSMIENTRAS 
+                | DENTROREPETIR:a IMPRIMIR:b puntoycoma:c {: String op=" "+a+" "+b+" "+c; RESULT=op; :}
+                | variab:a DECVARREPETIR:b puntoycoma:c {: String op=a+" "+b+c; RESULT=op; :}
+                | ASIGNARVARIABLE:a puntoycoma:b {: String op=a+b; RESULT=op; :}
+                | ASIGNAARREGLO:a puntoycoma:b {: String op=a+b; RESULT=op; :}
+                | INSIF 
+                | INSREPETIR:a {: String op=" "+a; RESULT=op; :} 
+                | INSMIENTRAS 
+                | IMPRIMIR:a puntoycoma:b {: String op=a+b; RESULT=op; :} ;
+
+DECVARREPETIR::= DECVARREPETIR:a igual:b LOGICAS:c {: String op=a+b+c; RESULT=op; :}
+            | DECVARREPETIR:a igual:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :}
+            | DECVARREPETIR:a corchabre:b intt:c corchcierra:d {: String op=a+b+c+d; RESULT=op; :}
+            | DECVARREPETIR:a igual:b llaveabre:c LISTARREGLO:d llavecierra:e {: String op=a+b+c+d+e; RESULT=op; :}
+            | DECVARREPETIR:a coma:b id:c {: String op=a+b+c; RESULT=op; :}
+            | id:a {:RESULT=a;:} ;
+
+
+//INSTRUCCION MIENTRAS
+INSMIENTRAS::= mientrass parenabre LOGICAS parencierra llaveabre DENTROMIENTRAS llavecierra {: System.out.println("mient"); :};
+
+DENTROMIENTRAS::= variab DECVARMIENTRAS puntoycoma
+                | ;
+
+DECVARMIENTRAS::= DECVARMIENTRAS igual LOGICAS
+            | DECVARMIENTRAS igual ALGEBRAICA
+            | DECVARMIENTRAS corchabre intt corchcierra //para arreglo
+            | DECVARMIENTRAS igual llaveabre LISTARREGLO llavecierra //lista de arreglos
+            | DECVARMIENTRAS coma id
+            | id;
+
+//PARA LISTA DE ARREGLOS
+LISTARREGLO::= LISTARREGLO:a coma:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :}
+            | ALGEBRAICA:a {: RESULT=a; :};
+
+//ASIGNAR VALOR A VARIABLE
+ASIGNARVARIABLE::= id:a igual:b TIPASIGNARVARIABLE:c {: String op=" "+a+b+c+" "; RESULT=op; :};
+
+//ASIGNAR VALOR A UN ARREGLO
+ASIGNAARREGLO::= id:a corchabre:b ALGEBRAICA:c corchcierra:d igual:e TIPASIGNARVARIABLE:f {: String op=a+b+c+d+e+f; RESULT=op; :};
+
+TIPASIGNARVARIABLE::= ALGEBRAICA:a {: RESULT=a; :}
+                    | LOGICAS:a {: RESULT=a; :};
+
+//IMPRIMIR
+IMPRIMIR::= imprimirr:a parenabre:b IMPRIOP:c parencierra:d {: String op=a+b+c+d; RESULT=op; :} ;
+
+IMPRIOP::= ALGEBRAICA:a {: RESULT=a; :}
+        | LOGICAS:a {: RESULT=a; :} ;
+
+LOGICAS::= LOGICAS:a andd:b LOGICAS:c {: String op=a+b+c; RESULT=op; :}
+        | LOGICAS:a orr:b LOGICAS:c {: String op=a+b+c; RESULT=op; :}
+        | LOGICAS:a xorr:b LOGICAS:c {: String op=a+b+c; RESULT=op; :}
+        | LOGICAS:a nott:b LOGICAS:c {: String op=a+b+c; RESULT=op; :}
+        | parenabre:a LOGICAS:b parencierra:c {: String op=a+b+c; RESULT=op; :}
+        | RELACIONAL:a {: RESULT=a; :};
+
+RELACIONAL::=RELACIONAL2:a igualigual:b RELACIONAL2:c {: String op=a+b+c; RESULT=op; :}
+
+            | RELACIONAL2:a diferenteigual:b RELACIONAL2:c {: String op=a+b+c; RESULT=op; :} 
+
+            | RELACIONAL2:a mayorque:b RELACIONAL2:c {: String op=a+b+c; RESULT=op; :}
+
+            | RELACIONAL2:a menorque:b RELACIONAL2:c {: String op=a+b+c; RESULT=op; :}
+
+            | RELACIONAL2:a mayorigual:b RELACIONAL2:c {: String op=a+b+c; RESULT=op; :}
+
+            | RELACIONAL2:a menorigual:b RELACIONAL2:c {: String op=a+b+c; RESULT=op; :};
+
+RELACIONAL2::= NEGATIVO:b intt:a {: if(b==null){ RESULT=a; }else{ String val=b+a; RESULT=val; } :}
+            | cadena:a {: RESULT=a; :}
+            | NEGATIVO:b doublee:a {: if(b==null){ RESULT=a; }else{ String val=b+a; RESULT=val; } :}
+            | caracter:a {: RESULT=a; :} ;
+
+
+
+ALGEBRAICA::= ALGEBRAICA:a mas:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :}    
+
+            | ALGEBRAICA:a menos:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :} 
+
+            | ALGEBRAICA:a producto:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :} 
+
+            | ALGEBRAICA:a division:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :} 
+
+            | ALGEBRAICA:a potencia:b ALGEBRAICA:c {: String op=a+b+c; RESULT=op; :} 
+
+            | parenabre:a ALGEBRAICA:b parencierra:c
+              {: String op=a+b+c; RESULT=op; :}
+            | cadena:a
+              {: RESULT=a; :} //para quitar comillas
+            | NEGATIVO:b intt:a
+              {: if(b==null){ RESULT=a; }else{ String val=b+a; RESULT=val; } :}
+            | NEGATIVO:b doublee:a
+              {: if(b==null){ RESULT=a; }else{ String val=b+a; RESULT=val; } :}
+            | caracter:a
+              {: RESULT=a; :}
+            | booll:a
+              {: RESULT=a; :}
+            | IDARR:a
+              {: RESULT=a; :};
+
+NEGATIVO::=menos:a {: RESULT=a.toString(); :}
+        | ;
+
+IDARR::= IDARR:a corchabre:b ALGEBRAICA:c corchcierra:d {: String op=a+b+c+d; RESULT=op; :}
+        | id:a {: RESULT=a; :} ;
